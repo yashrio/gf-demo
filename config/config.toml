@@ -1,0 +1,65 @@
+# HTTP Server
+[server]
+	Address     = ":8199"
+	ServerRoot  = "public"
+	ServerAgent = "gf-app"
+    nameToUriType = 2
+	LogPath     = "/tmp/log/gf-app/server"
+
+# Logger.
+[logger]
+    Path        = "/tmp/log/gf-app"
+    Level       = "all"
+    Stdout      = true
+
+# Template.
+[viewer]
+    Path        = "template"
+    DefaultFile = "index.html"
+    Delimiters  =  ["${", "}"]
+
+# Redis数据库配置
+[redis]
+    default = "127.0.0.1:6379,1"
+
+# jwt配置
+[gToken]
+    CacheMode = 2
+    CacheKey = "GToken:"
+    Timeout = 0
+    MaxRefresh = 0
+    TokenDelimiter="_"
+    EncryptKey = "koi29a83idakguqjq29asd9asd8a7jhq"
+    AuthFailMsg = "登录超时，请重新登录"
+    MultiLogin = false
+
+# 微信小程序配置
+[wechat.mini]
+    AppID          = "wxca2595f9892f5ee2"
+    AppSecret      = "ebb84ce317c29f6a1cc5d7b7a4c34aa2"
+    EncodingAESKey = ""
+    Token          = ""
+
+# Minio配置
+[minio]
+    endpoint        = "127.0.0.1:9000"
+    accessKeyID     = "minio"
+    secretAccessKey = "minio123"
+    useSSL          = false
+
+# Database.
+[database]
+    link  = "mysql:root:1qaz2wsx#EDC@tcp(127.0.0.1:3306)/gf_demo"
+    debug = true
+    # Database logger.
+    [database.logger]
+        Path   = "/tmp/log/gf-app/sql"
+        Level  = "all"
+        Stdout = true
+
+[gfcli]
+    [[gfcli.gen.dao]]
+        link   = "mysql:root:1qaz2wsx#EDC@tcp(127.0.0.1:3306)/gf_demo"
+        group  = ""
+        prefix = ""
+        tables = ""
