@@ -18,9 +18,7 @@ gf run main.go --swagger
 
 | 接口名称 | 地址                             | 请求数据                                                 |
 | -------- | -------------------------------- | -------------------------------------------------------- |
-| 登录     | http://localhost:8199/auth/login | {<br/>	"stype": "mobile",
-	"mobile": "13718878727"
-} |
+| 登录     | http://localhost:8199/auth/login | {"stype": "mobile","mobile": "13718878727"} |
 
 其他接口可以使用swagger访问 http://localhost:8199/swagger
 
