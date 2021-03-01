@@ -1,20 +1,21 @@
 package hello
 
 import (
-    "gf-demo/app/service"
-    "gf-demo/app/service/define"
-    "gf-demo/library/oss"
-    "gf-demo/library/response"
-    "gf-demo/library/wechat"
-    "github.com/gogf/gf/frame/g"
-    "github.com/gogf/gf/net/ghttp"
-    "github.com/gogf/gf/os/gfile"
+	"gf-demo/app/service"
+	"gf-demo/app/service/define"
+	"gf-demo/library/aliyun/green"
+	"gf-demo/library/oss"
+	"gf-demo/library/response"
+	"gf-demo/library/wechat"
+	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/os/gfile"
+	"uuid"
 )
 
 var Hello = new(helloApi)
 
-type helloApi struct {}
-
+type helloApi struct{}
 
 // @summary 分页获取用户
 // @tags    用户服务
@@ -23,18 +24,18 @@ type helloApi struct {}
 // @Param data body define.UserQuery true "用户分页查询"
 // @router  /hello/users [POST]
 // @success 200 {object} response.JsonResponse "执行结果"
-func (a *helloApi) Users(r *ghttp.Request)  {
-    var (
-        q *define.UserQuery
-    )
-    if err := r.Parse(&q); err != nil {
-        response.JsonExit(r, -1, "参数错误")
-    }
-    if list, err := service.User.GetUserList(q); err != nil {
-        response.JsonExit(r, -1, "查询异常")
-    } else {
-        response.SuccExit(r, "ok", list)
-    }
+func (a *helloApi) Users(r *ghttp.Request) {
+	var (
+		q *define.UserQuery
+	)
+	if err := r.Parse(&q); err != nil {
+		response.JsonExit(r, -1, "参数错误")
+	}
+	if list, err := service.User.GetUserList(q); err != nil {
+		response.JsonExit(r, -1, "查询异常")
+	} else {
+		response.SuccExit(r, "ok", list)
+	}
 }
 
 // @summary     测试接口
@@ -42,11 +43,11 @@ func (a *helloApi) Users(r *ghttp.Request)  {
 // @produce     json
 // @router      /hello/test [POST]
 // @success     200 {object} response.JsonResponse "执行结果"
-func (a *helloApi) Test(r *ghttp.Request)  {
-    if result, err := wechat.MiniCode2Session("123123213"); err == nil {
-        response.JsonExit(r, 0, result.OpenID)
-    }
-    response.JsonExit(r,0, "test")
+func (a *helloApi) Test(r *ghttp.Request) {
+	if result, err := wechat.MiniCode2Session("123123213"); err == nil {
+		response.JsonExit(r, 0, result.OpenID)
+	}
+	response.JsonExit(r, 0, "test")
 }
 
 // @summary     获取当前用户信息
@@ -56,11 +57,11 @@ func (a *helloApi) Test(r *ghttp.Request)  {
 // @router      /hello/profile [GET]
 // @success     200 {object} define.ProfileResult "执行结果"
 func (a *helloApi) Profile(r *ghttp.Request) {
-    if profile, err := service.User.Profile(r.Context()); err != nil {
-        response.Fail(r, -1, err.Error())
-    } else {
-        response.Succ(r, "ok", profile)
-    }
+	if profile, err := service.User.Profile(r.Context()); err != nil {
+		response.Fail(r, -1, err.Error())
+	} else {
+		response.Succ(r, "ok", profile)
+	}
 }
 
 // @summary     上传文件
@@ -71,32 +72,32 @@ func (a *helloApi) Profile(r *ghttp.Request) {
 // @router      /hello/upload [POST]
 // @success     200 {object} response.JsonResponse "执行结果"
 func (a helloApi) Upload(r *ghttp.Request) {
-    upfile := r.GetUploadFile("file")
-    if fileName, err := upfile.Save(gfile.TempDir()); err != nil {
-        response.FailExit(r, -1, "上传失败")
-    } else {
-        tempFile := gfile.Join(gfile.TempDir(), fileName)
-        _, err := oss.FileUpload(&oss.MinioFileObject{
-            ObjectName: upfile.Filename,
-            FilePath: tempFile,
-            Bucket: oss.MinioBucket{
-                BucketName: "img",
-                Location: "cn-north-1",
-            },
-            Config: oss.MinioConfig{
-                EndPoint: g.Cfg().GetString("minio.endpoint"),
-                AccessKeyID: g.Cfg().GetString("minio.accessKeyID"),
-                SecretAccessKey: g.Cfg().GetString("minio.secretAccessKey"),
-                UseSSL: g.Cfg().GetBool("minio.useSSL"),
-            },
-        })
-        if err != nil {
-            response.FailExit(r, -1, "上传失败")
-        } else {
-            go gfile.Remove(tempFile)
-            response.Succ(r,"上传成功")
-        }
-    }
+	upfile := r.GetUploadFile("file")
+	if fileName, err := upfile.Save(gfile.TempDir()); err != nil {
+		response.FailExit(r, -1, "上传失败")
+	} else {
+		tempFile := gfile.Join(gfile.TempDir(), fileName)
+		_, err := oss.FileUpload(&oss.MinioFileObject{
+			ObjectName: upfile.Filename,
+			FilePath:   tempFile,
+			Bucket: oss.MinioBucket{
+				BucketName: "img",
+				Location:   "cn-north-1",
+			},
+			Config: oss.MinioConfig{
+				EndPoint:        g.Cfg().GetString("minio.endpoint"),
+				AccessKeyID:     g.Cfg().GetString("minio.accessKeyID"),
+				SecretAccessKey: g.Cfg().GetString("minio.secretAccessKey"),
+				UseSSL:          g.Cfg().GetBool("minio.useSSL"),
+			},
+		})
+		if err != nil {
+			response.FailExit(r, -1, "上传失败")
+		} else {
+			go gfile.Remove(tempFile)
+			response.Succ(r, "上传成功")
+		}
+	}
 }
 
 // @summary     查看文件
@@ -107,26 +108,59 @@ func (a helloApi) Upload(r *ghttp.Request) {
 // @router      /hello/viewfile [GET]
 // @success     200 {object} response.JsonResponse "执行结果"
 func (a *helloApi) ViewFile(r *ghttp.Request) {
-    //data := r.GetFormMapStrStr()
-    //fileName := data["fileName"]
-    fileName := r.GetQueryString("fileName")
-    miniFileObject := &oss.MinioFileObject{
-        ObjectName: fileName,
-        Bucket: oss.MinioBucket{
-            BucketName: "img",
-            Location: "cn-north-1",
-        },
-        Config: oss.MinioConfig{
-            EndPoint: g.Cfg().GetString("minio.endpoint"),
-            AccessKeyID: g.Cfg().GetString("minio.accessKeyID"),
-            SecretAccessKey: g.Cfg().GetString("minio.secretAccessKey"),
-            UseSSL: g.Cfg().GetBool("minio.useSSL"),
-        },
-    }
-    object, err := oss.GetFile(miniFileObject)
-    if err != nil {
-        response.FailExit(r, -1, "文件不存在")
-    } else {
-        r.Response.Write(object)
-    }
+	//data := r.GetFormMapStrStr()
+	//fileName := data["fileName"]
+	fileName := r.GetQueryString("fileName")
+	miniFileObject := &oss.MinioFileObject{
+		ObjectName: fileName,
+		Bucket: oss.MinioBucket{
+			BucketName: "img",
+			Location:   "cn-north-1",
+		},
+		Config: oss.MinioConfig{
+			EndPoint:        g.Cfg().GetString("minio.endpoint"),
+			AccessKeyID:     g.Cfg().GetString("minio.accessKeyID"),
+			SecretAccessKey: g.Cfg().GetString("minio.secretAccessKey"),
+			UseSSL:          g.Cfg().GetBool("minio.useSSL"),
+		},
+	}
+	object, err := oss.GetFile(miniFileObject)
+	if err != nil {
+		response.FailExit(r, -1, "文件不存在")
+	} else {
+		r.Response.Write(object)
+	}
+}
+
+// @summary     图片审核
+// @tags        内容安全
+// @produce     json
+// @Security    ApiKeyAuth
+// @Param       data body define.ScanImg true "图片地址"
+// @router      /hello/imgscan [POST]
+// @success     200 {object} response.JsonResponse "执行结果"
+func (a helloApi) ImgScan(r *ghttp.Request) {
+	var (
+		scanImg *define.ScanImg
+	)
+	if err := r.Parse(&scanImg); err != nil {
+		response.FailExit(r, -1, "图片地址有误")
+	} else {
+		scanResult, err := green.AliGreen.ScanImg([]green.Task{
+			green.Task{
+				DataId: uuid.Rand().Hex(),
+				Url:    scanImg.Url,
+			},
+		}, "default", []string{"porn"})
+		if err != nil {
+			response.FailExit(r, -1, err.Error())
+		}
+
+		ret := green.AliGreen.AnalysisScanResult(*scanResult)
+		if len(ret) == 0 {
+			response.SuccExit(r, "ok")
+		} else {
+			response.FailExit(r, -1, "错误", ret)
+		}
+	}
 }

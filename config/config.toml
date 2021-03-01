@@ -47,6 +47,11 @@
     secretAccessKey = "minio123"
     useSSL          = false
 
+# 阿里云key
+[aliyun]
+    accessKeyId     = "LTAI4G7Nv3Dm1pU53BU1HnBa"
+    accessKeySecret = "cBC9zUJb0azOshuVZVFSoV6WVbyUO3"
+
 # Database.
 [database]
     link  = "mysql:root:1qaz2wsx#EDC@tcp(127.0.0.1:3306)/gf_demo"

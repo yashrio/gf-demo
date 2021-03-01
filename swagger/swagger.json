@@ -10,6 +10,41 @@
         "version": "1.0"
     },
     "paths": {
+        "/hello/imgscan": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "内容安全"
+                ],
+                "summary": "图片审核",
+                "parameters": [
+                    {
+                        "description": "图片地址",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/define.ScanImg"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/response.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/hello/profile": {
             "get": {
                 "security": [
@@ -165,6 +200,15 @@
                 },
                 "nickName": {
                     "description": "昵称",
+                    "type": "string"
+                }
+            }
+        },
+        "define.ScanImg": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "图片地址",
                     "type": "string"
                 }
             }
